@@ -1,0 +1,36 @@
+# Install and load required library
+if (!requireNamespace("readxl", quietly = TRUE)) {
+  install.packages("readxl")
+}
+library(readxl)
+
+# Define the file path for the Excel file containing URLs (modify to your path)
+file_path <- "C:/Users/lambere/Downloads/Journee_Scientifique_2024_inscriptions_02-avril-2024.xlsx"
+
+# Read the Excel file
+data <- read_excel(file_path)
+
+# Extract URLs from the 13th column, starting from row 2 to row 108
+urls <- as.character(data[[13]])[1:107]
+
+# Define the folder to save the files
+folder_path <- "C:/Users/lambere/Downloads/Abstracts"
+
+# Create the folder if it doesn't exist
+if (!dir.exists(folder_path)) {
+  dir.create(folder_path, recursive = TRUE)
+}
+
+# Loop through each URL and download the file
+for (url in urls) {
+  if (!is.na(url)) {
+    tryCatch({
+      download.file(url, destfile = file.path(folder_path, basename(url)), mode = "wb")
+      cat("File downloaded:", basename(url), "\n")
+    }, error = function(e) {
+      cat("Error downloading:", basename(url), "\n")
+    })
+  } else {
+    cat("Skipping invalid URL\n")
+  }
+}
